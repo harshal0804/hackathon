@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const apiUrl = "http://192.168.29.123:3000";
+  const apiUrl = "http://172.16.235.0:3000";
 
   const fetchApi = async (endpoint, options = {}) => {
     try {

@@ -290,6 +290,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E5E9F2",
     marginTop: 80, // Add this to account for the header
     padding: 20,
+    paddingBottom: 200,
   },
   profileInfo: {
     backgroundColor: "#f5f5f5",
@@ -316,6 +317,7 @@ const styles = StyleSheet.create({
   },
   userPosts: {
     flex: 1,
+    marginBottom: 100,
   },
   postsHeader: {
     fontSize: 24,

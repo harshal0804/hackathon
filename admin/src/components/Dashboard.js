@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polygon } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Dashboard.css";
@@ -23,6 +23,45 @@ const markerIcons = {
   resolved: createMarkerIcon("#4caf50"),
 };
 
+// Calculate the bounds from CAMPUS_POLYGON coordinates
+const getBounds = (polygon) => {
+  const lats = polygon.map(point => point[0]);
+  const lngs = polygon.map(point => point[1]);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+  const minLng = Math.min(...lngs);
+  const maxLng = Math.max(...lngs);
+  // Add a small padding (0.0002 degrees ≈ 20 meters)
+  return [
+    [minLat - 0.0002, minLng - 0.0002], // Southwest
+    [maxLat + 0.0002, maxLng + 0.0002]  // Northeast
+  ];
+};
+
+// Update the college coordinates to center of polygon
+const COLLEGE_COORDS = {
+  lat: 19.021194, // Approximate center of the polygon
+  lng: 72.870944
+};
+
+// Update the CAMPUS_POLYGON coordinates with additional points
+const CAMPUS_POLYGON = [
+  // [19.022028, 72.869722], // Northwest
+  // [19.02192869258965, 72.8703400686917], // Northeast
+  // [19.021325596155776, 72.8703766856377], // Between Northeast and Southeast
+  // [19.020861, 72.871222], // Southeast
+  // [19.0205556, 72.8705556], // Between Southeast and Southwest
+  // [19.020833, 72.869556], // Southwest
+  // [19.022028, 72.869722], // Back to Northwest to close the polygon
+  [19.022028, 72.869722], // Northwest
+  [19.021528, 72.872333], // Northeast
+  [19.0211667, 72.8722222], // Between Northeast and Southeast
+  [19.020861, 72.871222], // Southeast
+  [19.0205556, 72.8705556], // Between Southeast and Southwest
+  [19.020833, 72.869556], // Southwest
+  [19.022028, 72.869722], // Back to Northwest to close the polygon
+];
+
 const Dashboard = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +72,7 @@ const Dashboard = () => {
     inProgress: 0,
     resolved: 0,
   });
-  const [mapCenter] = useState([19.0216852, 72.8701941]);
+  const [mapCenter] = useState([COLLEGE_COORDS.lat, COLLEGE_COORDS.lng]);
   const [mapZoom] = useState(18);
   const navigate = useNavigate();
 
@@ -198,13 +237,10 @@ const Dashboard = () => {
           zoom={mapZoom}
           style={{ height: "70vh", width: "100%", borderRadius: "12px" }}
           options={{
-            minZoom: 14,
+            minZoom: 16,
             maxZoom: 30,
-            maxBounds: [
-              [19.0216852 - 0.001, 72.8701941 - 0.001],
-              [19.0216852 + 0.001, 72.8701941 + 0.001]
-            ],
-            maxBoundsViscosity: 1.0,
+            maxBounds: getBounds(CAMPUS_POLYGON),
+            maxBoundsViscosity: 1.0, // Makes the bounds completely rigid
             dragging: true,
             scrollWheelZoom: true,
             bounceAtZoomLimits: true
@@ -215,12 +251,11 @@ const Dashboard = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           
-          <Circle
-            center={[19.0216852, 72.8701941]}
-            radius={100}
+          <Polygon
+            positions={CAMPUS_POLYGON}
             pathOptions={{
-              color: '#012970',
-              fillColor: '#012970',
+              color: '#235DFF',
+              fillColor: '#235DFF',
               fillOpacity: 0.1,
               weight: 2,
               dashArray: '5, 5',
@@ -228,14 +263,14 @@ const Dashboard = () => {
           >
             <Popup>
               <div className="popup-content">
-                <h3>Geofence Boundary</h3>
-                <p>100m radius around college</p>
+                <h3>Campus Area</h3>
+                <p>Highlighted campus boundary</p>
               </div>
             </Popup>
-          </Circle>
+          </Polygon>
 
           <Marker
-            position={[19.0216852, 72.8701941]}
+            position={[COLLEGE_COORDS.lat, COLLEGE_COORDS.lng]}
             icon={L.divIcon({
               className: 'college-marker',
               html: `<div style="background-color: #012970; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white;"></div>`,
@@ -245,8 +280,8 @@ const Dashboard = () => {
           >
             <Popup>
               <div className="popup-content">
-                <h3>Your College Name</h3>
-                <p>Your College Address</p>
+                <h3>Vidyalankar Institute of Technology</h3>
+                <p>Vidyalankar Marg, Wadala (East), Mumbai, Maharashtra 400037</p>
               </div>
             </Popup>
           </Marker>
@@ -288,15 +323,6 @@ const Dashboard = () => {
                     <option value="resolved">Resolved</option>
                   </select>
                   
-                  {/* {post.status === 'resolved' && (
-                    <button 
-                      onClick={() => handleDelete(post._id)}
-                      className="delete-button"
-                    >
-                      
-                      Delete Report
-                    </button>
-                  )} */}
                 </div>
                 
               </Popup>

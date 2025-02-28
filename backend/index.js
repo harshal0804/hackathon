@@ -16,7 +16,7 @@ const port = 3000;
 const app = express();
 
 // MongoDB connection setup
-const mongoURI = "mongodb://localhost:27017/auth_example"; // Replace with your MongoDB URI
+const mongoURI = "mongodb://localhost:27017/test1"; // Replace with your MongoDB URI
 mongoose
   .connect(mongoURI, {
     useNewUrlParser: true,
@@ -39,8 +39,8 @@ app.use(
     origin: [
       "http://localhost:3001",
       "http://localhost:3000",
-      "http://192.168.29.123:3001",
-      "http://192.168.29.123:3000",
+      "http://172.16.235.0:3001",
+      "http://172.16.235.0:3000",
     ],
     credentials: true, // Allow credentials in requests
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
